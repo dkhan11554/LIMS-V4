@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["app*"]
+
+[project]
+name = "nextgen-ai-lims-backend"
+version = "0.1.0"
+description = "Python/FastAPI backend for the NextGen AI-LIMS platform (migrated from Convex)."
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115,<1.0",
+    "uvicorn[standard]>=0.32,<1.0",
+    "sqlalchemy>=2.0.35,<3.0",
+    "alembic>=1.13,<2.0",
+    "pydantic>=2.9,<3.0",
+    "pydantic-settings>=2.5,<3.0",
+    "python-jose[cryptography]>=3.3,<4.0",
+    "passlib[bcrypt]>=1.7,<2.0",
+    # passlib 1.7.4's bcrypt backend probing is incompatible with bcrypt>=4.1
+    # (see https://github.com/pyca/bcrypt/issues/684); pin until passlib cuts
+    # a release with a fix, or migrate to a maintained hasher.
+    "bcrypt>=4.0,<4.1",
+    "python-multipart>=0.0.12",
+    "psycopg[binary]>=3.2,<4.0",
+    "python-dotenv>=1.0,<2.0",
+    "email-validator>=2.2,<3.0",
+]
+
+[project.optional-dependencies]
+# Only needed when DATABASE_URL points at SQL Server (requires the system
+# "ODBC Driver 18 for SQL Server" + unixODBC to be installed separately).
+mssql = [
+    "pyodbc>=5.1,<6.0",
+]
+minio = [
+    "minio>=7.2,<8.0",
+]
+dev = [
+    "pytest>=8.3,<9.0",
+    "pytest-asyncio>=0.24,<1.0",
+    "httpx>=0.27,<1.0",
+    "ruff>=0.7,<1.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["app/tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
