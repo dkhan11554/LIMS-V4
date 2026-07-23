@@ -53,8 +53,8 @@ import InstrumentQcPage from "./pages/instruments/qc/page.tsx";
 
 export default function App() {
   return (
-    <DefaultProviders>
-      <BrowserRouter>
+    <BrowserRouter>
+      <DefaultProviders>
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
@@ -108,7 +108,7 @@ export default function App() {
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
-      </BrowserRouter>
-    </DefaultProviders>
+      </DefaultProviders>
+    </BrowserRouter>
   );
 }

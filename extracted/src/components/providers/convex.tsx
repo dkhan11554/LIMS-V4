@@ -1,10 +1,16 @@
 import { ConvexProviderWithHerculesAuth } from "@usehercules/auth/convex-react";
 import { ConvexReactClient } from "convex/react";
-
-const convexUrl = import.meta.env.VITE_CONVEX_URL ?? "http://localhost:3000";
-const convex = new ConvexReactClient(convexUrl);
+import { useMemo } from "react";
 
 export function ConvexProvider({ children }: { children: React.ReactNode }) {
+  const convex = useMemo(() => {
+    const convexUrl = import.meta.env.VITE_CONVEX_URL;
+    if (!convexUrl) {
+      throw new Error("VITE_CONVEX_URL is required for legacy Convex routes.");
+    }
+    return new ConvexReactClient(convexUrl);
+  }, []);
+
   return (
     <ConvexProviderWithHerculesAuth client={convex}>
       {children}
