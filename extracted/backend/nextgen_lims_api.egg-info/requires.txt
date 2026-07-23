@@ -1,0 +1,15 @@
+alembic>=1.16
+asyncpg>=0.30
+email-validator>=2.2
+fastapi>=0.116
+httpx>=0.28
+pydantic-settings>=2.10
+PyJWT[crypto]>=2.10
+SQLAlchemy>=2.0
+uvicorn[standard]>=0.35
+
+[dev]
+aiosqlite>=0.21
+pytest>=8.4
+pytest-asyncio>=1.1
+ruff>=0.12
