@@ -35,7 +35,11 @@ async def bootstrap_admin(object_id: str, email: str, name: str) -> None:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--object-id", required=True, help="Microsoft Entra user's Object ID (oid claim)")
+    parser.add_argument(
+        "--object-id",
+        required=True,
+        help="Microsoft Entra user's Object ID (oid claim)",
+    )
     parser.add_argument("--email", required=True, help="Administrator email address")
     parser.add_argument("--name", required=True, help="Administrator display name")
     return parser.parse_args()
