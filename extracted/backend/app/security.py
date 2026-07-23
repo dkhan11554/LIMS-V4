@@ -40,14 +40,17 @@ def validate_entra_access_token(token: str, settings: Settings) -> dict:
         )
     try:
         signing_key = _get_jwks_client(settings.entra_jwks_url).get_signing_key_from_jwt(token)
-        return jwt.decode(
+        claims = jwt.decode(
             token,
             signing_key.key,
             algorithms=["RS256"],
             audience=settings.resolved_entra_audience,
             issuer=settings.resolved_entra_issuer,
-            options={"require": ["exp", "iat", "iss", "aud", "sub"]},
+            options={"require": ["exp", "iat", "iss", "aud", "sub", "tid"]},
         )
+        if claims["tid"] != settings.entra_tenant_id:
+            raise _unauthorized("Access token was issued by an unexpected tenant")
+        return claims
     except jwt.PyJWTError as exc:
         raise _unauthorized("Invalid or expired access token") from exc
 

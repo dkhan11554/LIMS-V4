@@ -19,6 +19,14 @@ class CurrentUser(APIModel):
     is_disabled: bool
 
 
+class AuthenticatedUser(APIModel):
+    id: uuid.UUID
+    email: EmailStr | None
+    display_name: str | None
+    roles: list[LimsRole]
+    permissions: list[str]
+
+
 class CompanyCreate(BaseModel):
     name: str = Field(min_length=1, max_length=255)
     legal_name: str | None = Field(default=None, max_length=255)

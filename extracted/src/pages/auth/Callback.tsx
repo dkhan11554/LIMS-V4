@@ -1,30 +1,39 @@
 import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuthCallback } from "@usehercules/auth/react";
-import { useConvexAuth, useMutation } from "convex/react";
-import { api } from "@/convex/_generated/api.js";
+import { useQueryClient } from "@tanstack/react-query";
+import { useAuthCallback, useUser } from "@usehercules/auth/react";
+import {
+  syncAuthenticatedUser,
+  type AuthenticatedUser,
+} from "@/lib/api-client.ts";
 import { Spinner } from "@/components/ui/spinner.tsx";
 import { Button } from "@/components/ui/button.tsx";
 
 export default function AuthCallback() {
   const navigate = useNavigate();
-  const { isAuthenticated: isConvexAuthenticated } = useConvexAuth();
-  const updateCurrentUser = useMutation(api.users.updateCurrentUser);
+  const queryClient = useQueryClient();
+  const { access_token: accessToken } = useUser();
 
   const onSync = useCallback(async () => {
-    await updateCurrentUser();
-  }, [updateCurrentUser]);
+    if (!accessToken) {
+      throw new Error(
+        "Microsoft Entra did not return an API access token. Please sign in again.",
+      );
+    }
 
-  const navigateHome = useCallback(
-    () => navigate("/", { replace: true }),
+    const user = await syncAuthenticatedUser(accessToken);
+    queryClient.setQueryData<AuthenticatedUser>(["auth", "current-user"], user);
+  }, [accessToken, queryClient]);
+
+  const navigateDashboard = useCallback(
+    () => navigate("/dashboard", { replace: true }),
     [navigate],
   );
 
   const { status, error, retry } = useAuthCallback({
-    isBackendAuthenticated: isConvexAuthenticated,
     onSync,
-    onSuccess: navigateHome,
-    onNoAuthParams: navigateHome,
+    onSuccess: navigateDashboard,
+    onNoAuthParams: navigateDashboard,
   });
 
   if (status === "error" && error) {
@@ -35,7 +44,7 @@ export default function AuthCallback() {
           <p className="text-sm text-muted-foreground max-w-md">{error}</p>
         </div>
         <div className="flex gap-3">
-          <Button variant="secondary" onClick={navigateHome}>
+          <Button variant="secondary" onClick={navigateDashboard}>
             Return home
           </Button>
           <Button onClick={retry}>Try again</Button>
