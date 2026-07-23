@@ -1,10 +1,12 @@
 import { Link } from "react-router-dom";
-import { Authenticated, Unauthenticated } from "convex/react";
+import { useAuth } from "@usehercules/auth/react";
 import { SignInButton } from "@/components/ui/signin.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import { FlaskConical, ShieldCheck, BarChart3, ArrowRight } from "lucide-react";
 
 export default function Index() {
+  const { isAuthenticated, isLoading } = useAuth();
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -20,14 +22,17 @@ export default function Index() {
             <span className="text-muted-foreground text-xs leading-tight">AI Data Software Solutions LLC</span>
           </div>
         </div>
-        <Authenticated>
+        {isLoading ? (
+          <Button size="sm" disabled>
+            Loading...
+          </Button>
+        ) : isAuthenticated ? (
           <Button asChild size="sm">
             <Link to="/dashboard">Go to Dashboard <ArrowRight size={14} className="ml-1" /></Link>
           </Button>
-        </Authenticated>
-        <Unauthenticated>
+        ) : (
           <SignInButton />
-        </Unauthenticated>
+        )}
       </header>
 
       {/* Hero */}
@@ -55,14 +60,17 @@ export default function Index() {
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-10 text-balance">
           From sample registration to COA generation. Manage your entire laboratory workflow with full audit trails, electronic signatures, and AI-powered insights.
         </p>
-        <Unauthenticated>
-          <SignInButton />
-        </Unauthenticated>
-        <Authenticated>
+        {isLoading ? (
+          <Button size="lg" disabled>
+            Loading...
+          </Button>
+        ) : isAuthenticated ? (
           <Button size="lg" asChild>
             <Link to="/dashboard">Open Dashboard <ArrowRight size={16} className="ml-1" /></Link>
           </Button>
-        </Authenticated>
+        ) : (
+          <SignInButton />
+        )}
 
         {/* Feature Cards */}
         <div className="grid md:grid-cols-3 gap-5 mt-20 text-left">
