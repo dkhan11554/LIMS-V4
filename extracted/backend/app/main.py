@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import auth, organization
+from app.api import auth, dashboard, organization
 from app.config import get_settings
 
 
@@ -33,6 +33,7 @@ if settings.cors_origins:
     )
 
 app.include_router(auth.router, prefix=settings.api_v1_prefix)
+app.include_router(dashboard.router, prefix=settings.api_v1_prefix)
 app.include_router(organization.router, prefix=settings.api_v1_prefix)
 
 

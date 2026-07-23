@@ -154,3 +154,35 @@ class Department(TimestampedModel, Base):
     )
 
     laboratory: Mapped[Laboratory] = relationship(back_populates="departments")
+
+
+class Customer(TimestampedModel, Base):
+    """Minimal customer read model required by the dashboard activity feed."""
+
+    __tablename__ = "customers"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    laboratory_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("laboratories.id", ondelete="RESTRICT"), nullable=False
+    )
+
+
+class Sample(TimestampedModel, Base):
+    """Minimal sample read model required by dashboard statistics."""
+
+    __tablename__ = "samples"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    lims_number: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
+    customer_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("customers.id", ondelete="RESTRICT"), nullable=False
+    )
+    laboratory_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("laboratories.id", ondelete="RESTRICT"), nullable=False
+    )
+    sample_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    priority: Mapped[str] = mapped_column(String(20), nullable=False)
+    status: Mapped[str] = mapped_column(String(50), nullable=False)
+    requested_completion_date: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    received_date: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

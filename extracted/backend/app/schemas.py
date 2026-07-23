@@ -27,6 +27,39 @@ class AuthenticatedUser(APIModel):
     permissions: list[str]
 
 
+class DashboardVolumeByDay(BaseModel):
+    date: str
+    count: int
+
+
+class DashboardPriority(BaseModel):
+    routine: int
+    urgent: int
+    stat: int
+
+
+class DashboardRecentSample(APIModel):
+    id: uuid.UUID = Field(serialization_alias="_id")
+    lims_number: str = Field(serialization_alias="limsNumber")
+    sample_name: str = Field(serialization_alias="sampleName")
+    customer_name: str = Field(serialization_alias="customerName")
+    priority: str
+    status: str
+
+
+class DashboardStatistics(BaseModel):
+    total: int
+    in_progress: int = Field(serialization_alias="inProgress")
+    pending_review: int = Field(serialization_alias="pendingReview")
+    completed: int
+    overdue: int
+    status_counts: dict[str, int] = Field(serialization_alias="statusCounts")
+    volume_by_day: list[DashboardVolumeByDay] = Field(serialization_alias="volumeByDay")
+    by_priority: DashboardPriority = Field(serialization_alias="byPriority")
+    avg_tat_days: float = Field(serialization_alias="avgTatDays")
+    recent_samples: list[DashboardRecentSample] = Field(serialization_alias="recentSamples")
+
+
 class CompanyCreate(BaseModel):
     name: str = Field(min_length=1, max_length=255)
     legal_name: str | None = Field(default=None, max_length=255)

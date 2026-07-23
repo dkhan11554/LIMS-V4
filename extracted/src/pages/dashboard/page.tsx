@@ -1,6 +1,6 @@
-import { useQuery } from "convex/react";
-import { api } from "@/convex/_generated/api.js";
-import { useActiveLab } from "@/hooks/use-active-lab.ts";
+import { useQuery } from "@tanstack/react-query";
+import { useUser } from "@usehercules/auth/react";
+import { getDashboardStatistics } from "@/lib/api-client.ts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card.tsx";
 import { Skeleton } from "@/components/ui/skeleton.tsx";
 import { StatusBadge } from "@/components/ui/status-badge.tsx";
@@ -107,9 +107,24 @@ function VolumeTooltip({ active, payload, label }: {
 }
 
 export default function DashboardPage() {
-  const { labId } = useActiveLab();
-  const stats = useQuery(api.samples.getDashboardStats, labId ? { laboratoryId: labId } : "skip");
-  const isLoading = stats === undefined;
+  const { access_token: accessToken, isLoading: isAuthLoading } = useUser();
+  const {
+    data: stats,
+    isLoading: isStatsLoading,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["dashboard-statistics"],
+    queryFn: () => getDashboardStatistics(accessToken!),
+    enabled: Boolean(accessToken),
+    retry: false,
+  });
+  const isLoading = isAuthLoading || (Boolean(accessToken) && isStatsLoading);
+  const errorMessage = error instanceof Error
+    ? error.message
+    : !isAuthLoading && !accessToken
+      ? "You must sign in to view the dashboard."
+      : null;
 
   // Build pie data from status counts
   const pieData = stats
@@ -162,6 +177,21 @@ export default function DashboardPage() {
           </div>
         </div>
       </Section>
+
+      {errorMessage && (
+        <Section delay={0.025}>
+          <Card>
+            <CardContent className="flex items-center justify-between gap-4 py-4">
+              <p className="text-sm text-destructive">{errorMessage}</p>
+              {accessToken && (
+                <Button variant="secondary" size="sm" onClick={() => void refetch()}>
+                  Try again
+                </Button>
+              )}
+            </CardContent>
+          </Card>
+        </Section>
+      )}
 
       {/* KPI Cards */}
       <Section delay={0.05}>

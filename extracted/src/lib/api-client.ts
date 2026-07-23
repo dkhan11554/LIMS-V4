@@ -8,6 +8,30 @@ export interface AuthenticatedUser {
   permissions: string[];
 }
 
+export interface DashboardStatistics {
+  total: number;
+  inProgress: number;
+  pendingReview: number;
+  completed: number;
+  overdue: number;
+  statusCounts: Record<string, number>;
+  volumeByDay: Array<{ date: string; count: number }>;
+  byPriority: {
+    routine: number;
+    urgent: number;
+    stat: number;
+  };
+  avgTatDays: number;
+  recentSamples: Array<{
+    _id: string;
+    limsNumber: string;
+    sampleName: string;
+    customerName: string;
+    priority: string;
+    status: string;
+  }>;
+}
+
 export class ApiClientError extends Error {
   constructor(
     message: string,
@@ -45,13 +69,17 @@ function getErrorMessage(body: unknown, status: number): string {
   return `The API request failed (${status}).`;
 }
 
-async function request<T>(path: string, accessToken: string): Promise<T> {
+async function request<T>(
+  path: string,
+  accessToken: string,
+  method: "GET" | "POST" = "GET",
+): Promise<T> {
   if (!apiBaseUrl) {
     throw new Error("VITE_API_BASE_URL is not configured.");
   }
 
   const response = await fetch(`${apiBaseUrl}${path}`, {
-    method: "POST",
+    method,
     headers: {
       Authorization: `Bearer ${accessToken}`,
       Accept: "application/json",
@@ -69,5 +97,11 @@ async function request<T>(path: string, accessToken: string): Promise<T> {
 export function syncAuthenticatedUser(
   accessToken: string,
 ): Promise<AuthenticatedUser> {
-  return request<AuthenticatedUser>("/auth/sync", accessToken);
+  return request<AuthenticatedUser>("/auth/sync", accessToken, "POST");
+}
+
+export function getDashboardStatistics(
+  accessToken: string,
+): Promise<DashboardStatistics> {
+  return request<DashboardStatistics>("/dashboard/statistics", accessToken);
 }
