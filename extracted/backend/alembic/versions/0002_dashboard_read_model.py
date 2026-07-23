@@ -5,8 +5,9 @@ Revises: 0001_identity_organization
 """
 
 import sqlalchemy as sa
-from alembic import op
 from sqlalchemy.dialects import postgresql
+
+from alembic import op
 
 revision = "0002_dashboard_read_model"
 down_revision = "0001_identity_organization"
