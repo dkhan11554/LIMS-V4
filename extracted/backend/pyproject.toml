@@ -10,6 +10,7 @@ dependencies = [
   "fastapi>=0.116",
   "httpx>=0.28",
   "pydantic-settings>=2.10",
+  "psycopg[binary]>=3.2",
   "PyJWT[crypto]>=2.10",
   "SQLAlchemy>=2.0",
   "uvicorn[standard]>=0.35",
